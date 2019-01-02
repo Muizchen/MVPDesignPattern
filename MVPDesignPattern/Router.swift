@@ -10,16 +10,18 @@ import Foundation
 import UIKit
 
 protocol PresenterProtocol {
-    var rootViewController: UIViewController { get }
+    var rootViewController: UIViewController & StateSubscriber { get }
 }
 
-protocol RootViewControllerProtocol {
-    var presenter: PresenterStateProtocol { get }
+protocol Action { }
+
+protocol State { }
+
+protocol StateSubscriber {
+    func newState(state: State)
 }
 
-protocol PresenterStateProtocol {
-    
-}
+typealias Reducer = (_ action: Action, _ state: State?) -> State
 
 class Router {
     

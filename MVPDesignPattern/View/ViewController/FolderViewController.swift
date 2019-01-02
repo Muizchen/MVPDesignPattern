@@ -17,13 +17,17 @@ class FolderViewController: UIViewController {
     @IBOutlet weak var tableView: UITableView!
     
     public var presenter: FolderPresenter?
-    private let folder: Folder
+    private var folder: Folder! {
+        didSet {
+            self.refreshData()
+        }
+    }
     
     init(folder: Folder) {
         self.folder = folder
         super.init(nibName: String(describing: FolderViewController.self), bundle: nil)
     }
-    
+
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -50,6 +54,11 @@ class FolderViewController: UIViewController {
 
 extension FolderViewController {
     
+    private func refreshData() {
+        self.title = folder === Store.shared.rootFolder ? .recordings : folder.name
+        self.tableView.reloadData()
+    }
+    
     @objc public func createNewFolder() {
         modalTextAlert(title: .createFolder, placeholder: .folderName) { (name) in
             if let name = name {
@@ -61,6 +70,17 @@ extension FolderViewController {
     
     @objc public func createNewRecording() {
         
+    }
+    
+}
+
+// 订阅State
+extension FolderViewController: StateSubscriber {
+    
+    func newState(state: State) {
+        if let folderState = state as? FolderState {
+            self.folder = folderState.rootFolder
+        }
     }
     
 }
@@ -103,8 +123,8 @@ extension FolderViewController: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let item = folder.contents[indexPath.row]
-        if let folder = item as? Folder {
-            presenter?.enterSubFolder(folder: folder)
+        if let folder = item as? Folder, let presenter = self.presenter {
+            presenter.dispatch(action: FolderAction.enterSubFolder(folder), state: nil)
         } else {
             
         }

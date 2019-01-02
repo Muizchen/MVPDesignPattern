@@ -17,7 +17,7 @@ class ViewController: UIViewController {
 
     @IBAction func push(_ sender: Any) {
         if let nav = self.navigationController {
-            Router.routeTo(presenter: FolderPresenter(rootFolder: nil), with: nav)
+            Router.routeTo(presenter: FolderPresenter(), with: nav)
         }
     }
     
